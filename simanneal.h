@@ -1,3 +1,18 @@
+/*
+    Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+    last modification: $LastChangedDate$  (revision $Rev$)
+    This software is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License (LGPL) as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License (LGPL) for more details.
+    You should have received a copy of the GNU Lesser General Public License (LGPL)
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #ifndef QUICKFITFITSA_H
 #define QUICKFITFITSA_H
 
@@ -153,7 +168,7 @@ class fitSimAnneal
          *         subsequent values \f$ \chi^2_{i-1}(\cdot) \f$ and \f$ \chi^2_i(\cdot) \f$ may not differ by more than \f$ f_{max} \f$
          */
         int Nepsilon;
-        /** \brief step vector, this vector holds the current maximúm step sizes */
+        /** \brief step vector, this vector holds the current maximÃºm step sizes */
         double* v;
         /** \brief current parameters */
         double* x0;
