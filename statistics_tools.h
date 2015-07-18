@@ -34,13 +34,27 @@
 #include <iomanip>
 #include <sstream>
 
+
+// ensure DLL_EXPORT in QuickiFit 3
+#ifdef QFLIB_LIBRARY
+#  include "lib_imexport.h"
+#endif
+
+// disable DLL_EXPORT if not defined by user
+#ifndef STATISTICSLIB_EXPORT
+#  ifdef LIB_EXPORT
+#    define STATISTICSLIB_EXPORT LIB_EXPORT
+#  else
+#    define STATISTICSLIB_EXPORT
+#  endif
+#endif
+
 #ifdef _OPENMP
 # include <omp.h>
 #endif
 
 
 
-#include "lib_imexport.h"
 #ifndef __LINUX__
 # if defined(linux)
 #  define __LINUX__
