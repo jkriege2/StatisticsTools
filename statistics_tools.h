@@ -36,7 +36,7 @@
 
 
 // ensure DLL_EXPORT in QuickiFit 3
-#ifdef QFLIB_LIBRARY
+#if defined(QFLIB_LIBRARY)||defined(IS_QUICKFIT3)
 #  include "lib_imexport.h"
 #endif
 
