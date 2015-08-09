@@ -1,0 +1,6 @@
+/test/statistics_test/*.user
+*.o
+*.exe
+Makefile
+Makefile.Debug
+Makefile.Release
