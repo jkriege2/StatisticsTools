@@ -5085,34 +5085,41 @@ inline bool statisticsPolyFit(const T* X, const T* Y, long N, long P, T* result_
             x=x*xx;
         }
     }
-
-//    std::cout<<"V = \n";
-//    statisticsPrintMatrix(V.data(),N,P+1);
-//    std::cout<<"\n";
+#ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
+    std::cout<<"V = \n";
+    statisticsPrintMatrix(V.data(),N,P+1);
+    std::cout<<"\n";
+#endif
 
     // calculate V^T
     StatisticsScopedPointer<T> VT(statisticsDuplicateArray(V.data(), N*(P+1)));
     linalgTransposeMatrix(VT.data(), N, P+1);
 
-//    std::cout<<"V^T = \n";
-//    statisticsPrintMatrix(VT.data(),P+1,N);
-//    std::cout<<"\n";
+#ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
+    std::cout<<"V^T = \n";
+    statisticsPrintMatrix(VT.data(),P+1,N);
+    std::cout<<"\n";
+#endif
 
     // calculate V^T*V
     StatisticsScopedPointer<T> VTV((T*)statisticsMalloc((P+1)*(P+1)*sizeof(T))); // use scoped pointer to ensure, that VTV is free'd, when the function is ending
     linalgMatrixProduct(VT.data(), P+1, N, V.data(), N, P+1, VTV.data());
 
-//    std::cout<<"V^T*V = \n";
-//    statisticsPrintMatrix(VTV.data(),P+1,P+1);
-//    std::cout<<"\n";
+#ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
+    std::cout<<"V^T*V = \n";
+    statisticsPrintMatrix(VTV.data(),P+1,P+1);
+    std::cout<<"\n";
+#endif
 
     // calculate V^T*y
     StatisticsScopedPointer<T> VTY((T*)statisticsMalloc((P+1)*sizeof(T))); // use scoped pointer to ensure, that VTY is free'd, when the function is ending
     linalgMatrixProduct(VT.data(), P+1, N, Y, N, 1, VTY.data());
 
-//    std::cout<<"V^T*y = \n";
-//    statisticsPrintMatrix(VTY.data(),P+1,1);
-//    std::cout<<"\n";
+#ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
+    std::cout<<"V^T*y = \n";
+    statisticsPrintMatrix(VTY.data(),P+1,1);
+    std::cout<<"\n";
+#endif
 
     // solve V^T*y = V^T*V*p
     bool ok=linalgLinSolve(VTV.data(), VTY.data(), P+1);
@@ -5122,6 +5129,12 @@ inline bool statisticsPolyFit(const T* X, const T* Y, long N, long P, T* result_
             result_out[p]=VTY[p];
         }
     }
+
+#ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
+    std::cout<<"result_out = \n";
+    statisticsPrintMatrix(result_out,P+1,1);
+    std::cout<<"\n";
+#endif
 
     return ok;
 }
