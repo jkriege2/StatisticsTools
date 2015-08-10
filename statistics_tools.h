@@ -4881,7 +4881,7 @@ inline bool linalgLinSolve(const T* A, const T* B, long N, long C, T* result_out
 #  elif defined(STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_colPivHouseholderQr)
         x=eA.colPivHouseholderQr().solve(eB);
 #  else
-        x=eA.jacobiSVD().solve(eB);
+        x=eA.fullPivLu().solve(eB);
 #  endif
     } else if (N==3 && C==1) {
         Eigen::Map<const Eigen::Matrix<T,3,3,Eigen::RowMajor> > eA(A);
@@ -4901,7 +4901,7 @@ inline bool linalgLinSolve(const T* A, const T* B, long N, long C, T* result_out
 #  elif defined(STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_colPivHouseholderQr)
         x=eA.colPivHouseholderQr().solve(eB);
 #  else
-        x=eA.jacobiSVD().solve(eB);
+        x=eA.fullPivLu().solve(eB);
 #  endif
     } else {
         Eigen::Map<const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> > eA(A,N,N);
@@ -4921,7 +4921,7 @@ inline bool linalgLinSolve(const T* A, const T* B, long N, long C, T* result_out
 #  elif defined(STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_colPivHouseholderQr)
         x=eA.colPivHouseholderQr().solve(eB);
 #  else
-        x=eA.jacobiSVD().solve(eB);
+        x=eA.fullPivLu().solve(eB);
 #  endif
     }
     return true;
