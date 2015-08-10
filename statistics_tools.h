@@ -79,6 +79,8 @@
 #  include <Eigen/Core>
 #  include <Eigen/LU>
 #  include <Eigen/QR>
+#  include <Eigen/Jacobi>
+#  include <Eigen/SVD>
 #endif
 
 #ifdef STATISTICS_TOOLS_USE_QFTOOLS_H
@@ -4861,7 +4863,7 @@ inline bool linalgMatrixInversionV(T matrix, long N) {
 */
 template <class T>
 inline bool linalgLinSolve(const T* A, const T* B, long N, long C, T* result_out) {
-#ifdef STATISTICS_TOOLS_MAY_USE_EIGEN3 && !defined(STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_noeigen)
+#if defined(STATISTICS_TOOLS_MAY_USE_EIGEN3) && (!defined(STATISTICS_TOOLS_linalgLinSolve_EIGENMETHOD_noeigen))
     if (N==2 && C==1) {
         Eigen::Map<const Eigen::Matrix<T,2,2,Eigen::RowMajor> > eA(A);
         Eigen::Matrix<T,2,1>  eB;
