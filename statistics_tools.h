@@ -76,11 +76,11 @@
 
 
 #ifdef STATISTICS_TOOLS_MAY_USE_EIGEN3
-#  include <Eigen/Core>
+#  include <Eigen/SVD>
+#  include <Eigen/Jacobi>
 #  include <Eigen/LU>
 #  include <Eigen/QR>
-#  include <Eigen/Jacobi>
-#  include <Eigen/SVD>
+#  include <Eigen/Core>
 #endif
 
 #ifdef STATISTICS_TOOLS_USE_QFTOOLS_H
