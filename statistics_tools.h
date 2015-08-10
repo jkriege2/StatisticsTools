@@ -4538,7 +4538,7 @@ inline bool linalgGaussJordan(T* m, long L, long C) {
     const long N=L;
 
     //std::cout<<"\nstep 0:\n";
-    //statisticsPrintMatrix(m, N, C);
+    //linalgPrintMatrix(m, N, C);
 
     // first we perform a Gauss-elimination, which transforms the  matrix in the left half of m into upper triangular form
     for (long k=0; k<N-1; k++) {
@@ -4566,7 +4566,7 @@ inline bool linalgGaussJordan(T* m, long L, long C) {
             }
         }
 
-        //statisticsPrintMatrix(m, N, C);
+        //linalgPrintMatrix(m, N, C);
     }
 
     // now we can caluate the determinant of the left half-matrix, which can be used to determine, whether matrix
@@ -4576,7 +4576,7 @@ inline bool linalgGaussJordan(T* m, long L, long C) {
     for (long k=0; k<N; k++) {
         det = det * m[linalgMatIndex(k,k,C)];
     }
-    //statisticsPrintMatrix(m, N, C);
+    //linalgPrintMatrix(m, N, C);
     //std::cout<<"\nstep 2:  det(M)="<<det<<"\n";
     if (fabs(det)<DBL_MIN*10.0) return false;
 
@@ -4594,7 +4594,7 @@ inline bool linalgGaussJordan(T* m, long L, long C) {
                 m[linalgMatIndex(i,c,C)] -= m[linalgMatIndex(k,c,C)]*s;
             }
         }
-        //statisticsPrintMatrix(m, N, C);
+        //linalgPrintMatrix(m, N, C);
     }
     // finally each line is normalized to 1 by dividing by the diagonal entry in the left NxN matrix
     // and copy the result to matrix_out
@@ -4628,7 +4628,7 @@ inline bool linalgGaussJordanV(std::vector<T>& m, long L, long C) {
     const long N=L;
 
     //std::cout<<"\nstep 0:\n";
-    //statisticsPrintMatrix(m, N, C);
+    //linalgPrintMatrix(m, N, C);
 
     // first we perform a Gauss-elimination, which transforms the  matrix in the left half of m into upper triangular form
     for (long k=0; k<N-1; k++) {
@@ -4656,7 +4656,7 @@ inline bool linalgGaussJordanV(std::vector<T>& m, long L, long C) {
             }
         }
 
-        //statisticsPrintMatrix(m, N, C);
+        //linalgPrintMatrix(m, N, C);
     }
 
     // now we can caluate the determinant of the left half-matrix, which can be used to determine, whether matrix
@@ -4666,7 +4666,7 @@ inline bool linalgGaussJordanV(std::vector<T>& m, long L, long C) {
     for (long k=0; k<N; k++) {
         det = det * m[linalgMatIndex(k,k,C)];
     }
-    //statisticsPrintMatrix(m, N, C);
+    //linalgPrintMatrix(m, N, C);
     //std::cout<<"\nstep 2:  det(M)="<<det<<"\n";
     if (fabs(det)<DBL_MIN*10.0) return false;
 
@@ -4684,7 +4684,7 @@ inline bool linalgGaussJordanV(std::vector<T>& m, long L, long C) {
                 m[linalgMatIndex(i,c,C)] -= m[linalgMatIndex(k,c,C)]*s;
             }
         }
-        //statisticsPrintMatrix(m, N, C);
+        //linalgPrintMatrix(m, N, C);
     }
     // finally each line is normalized to 1 by dividing by the diagonal entry in the left NxN matrix
     // and copy the result to matrix_out
@@ -5087,7 +5087,7 @@ inline bool statisticsPolyFit(const T* X, const T* Y, long N, long P, T* result_
     }
 #ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
     std::cout<<"V = \n";
-    statisticsPrintMatrix(V.data(),N,P+1);
+    linalgPrintMatrix(V.data(),N,P+1);
     std::cout<<"\n";
 #endif
 
@@ -5097,7 +5097,7 @@ inline bool statisticsPolyFit(const T* X, const T* Y, long N, long P, T* result_
 
 #ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
     std::cout<<"V^T = \n";
-    statisticsPrintMatrix(VT.data(),P+1,N);
+    linalgPrintMatrix(VT.data(),P+1,N);
     std::cout<<"\n";
 #endif
 
@@ -5107,7 +5107,7 @@ inline bool statisticsPolyFit(const T* X, const T* Y, long N, long P, T* result_
 
 #ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
     std::cout<<"V^T*V = \n";
-    statisticsPrintMatrix(VTV.data(),P+1,P+1);
+    linalgPrintMatrix(VTV.data(),P+1,P+1);
     std::cout<<"\n";
 #endif
 
@@ -5117,7 +5117,7 @@ inline bool statisticsPolyFit(const T* X, const T* Y, long N, long P, T* result_
 
 #ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
     std::cout<<"V^T*y = \n";
-    statisticsPrintMatrix(VTY.data(),P+1,1);
+    linalgPrintMatrix(VTY.data(),P+1,1);
     std::cout<<"\n";
 #endif
 
@@ -5132,7 +5132,7 @@ inline bool statisticsPolyFit(const T* X, const T* Y, long N, long P, T* result_
 
 #ifdef STATISTICS_TOOLS_DEBUG_statisticsPolyFit
     std::cout<<"result_out = \n";
-    statisticsPrintMatrix(result_out,P+1,1);
+    linalgPrintMatrix(result_out,P+1,1);
     std::cout<<"\n";
 #endif
 
