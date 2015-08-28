@@ -580,7 +580,7 @@ inline double statisticsAverageVariance(double& var, const T* weights, const T* 
     register long long i;
     //#pragma omp simd reduction(+:sum) reduction(+:sum2)
     for (i=0; i<N; i++) {
-        register const T v=value[i]-avg;
+        register const double v=value[i]-avg;
         if (statisticsFloatIsOK(v)) {
             sum=sum+(double)weights[i];
             sum2=sum2+(double)(v*v*weights[i]);
