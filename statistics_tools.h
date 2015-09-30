@@ -1258,7 +1258,7 @@ inline void statisticsCrosscorrelateMultiTauSymmetricWithBlocking(double* dataou
 
                     lastvar.push_back(var);
                     lastvarerr.push_back(varerr);
-                    bcurveT.push_back(pow(2,b));
+                    bcurveT.push_back((int)pow(2.0,(double)b));
 
                     //std::cout<<b<<"; "<<pow(2,b)<<"; "<<(var)<<"; "<<(varerr)<<"; "<<Nb;
                     if (b>0)  {
@@ -1727,7 +1727,7 @@ inline void statisticsCrosscorrelateMultiTauAvgSymmetricWithBlocking(double* dat
 
                         lastvar.push_back(var);
                         lastvarerr.push_back(varerr);
-                        bcurveT.push_back(pow(2,b));
+                        bcurveT.push_back((int)pow(2.0,(double)b));
 
                         //std::cout<<b<<"; "<<pow(2,b)<<"; "<<(var)<<"; "<<(varerr)<<"; "<<Nb;
                         if (b>0)  {
