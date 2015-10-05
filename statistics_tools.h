@@ -819,7 +819,10 @@ inline void statisticsMaskedMinMax(const T* data, const bool* mask, long long N,
     }
 }
 
-/** \brief calculate min/max of a given array, only taking into account the pixels for which \c mask[i]==maskUseValue */
+/** \brief calculate min/max of a given array, only taking into account the pixels for which \c mask[i]==maskUseValue: In this function, the index into the mask is given by \c maskIdx=idx%Nmask, i.e. the mask may be smaller than the data and is repeated, if it is smaller.
+ *
+ * This can be used for masks in an image stack, where the mask is per frame (size w*h), but the stack consists of several frames (each frame is w*h and then N=Nframes*w*h).
+*/
 template <class T>
 inline void statisticsModMaskedMinMax(const T* data, const bool* mask, long long N, long long Nmask, T& min, T& max, bool maskUseValue=false) {
     if (!mask) {
