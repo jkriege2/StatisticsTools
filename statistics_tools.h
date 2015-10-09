@@ -4261,7 +4261,7 @@ inline void linalgPM1ToNonlinRWBColors(double val, uint8_t& r, uint8_t& g, uint8
 
 */
 template <class T>
-inline std::string linalgMatrixToHTMLString(T* matrix, long L, long C, int width=9, int precision=3, const std::string& mode=std::string("g"), const std::string& tableformat=std::string(), const std::string& prenumber=std::string(), const std::string& postnumber=std::string(), bool colorcoding=false, bool zeroIsWhite=true, std::string* colorlabel=NULL, bool nonlinColors=false, double nonlinColorsGamma=0.25) {
+inline std::string linalgMatrixToHTMLString(T* matrix, long L, long C, int width=9, int precision=3, const std::string& mode=std::string("g"), const std::string& tableformat=std::string(), const std::string& prenumber=std::string(), const std::string& postnumber=std::string(), bool colorcoding=false, bool zeroIsWhite=true, std::string* colorlabel=NULL, bool nonlinColors=false, double nonlinColorsGamma=0.25, const std::string& colortableformat=std::string()) {
     std::ostringstream ost;
     ost<<"<table "<<tableformat<<">\n";
     std::string format="%"+linalgIntToStr(width)+std::string(".")+linalgIntToStr(precision)+std::string("l")+mode;
@@ -4330,13 +4330,13 @@ inline std::string linalgMatrixToHTMLString(T* matrix, long L, long C, int width
             linalgPM1ToRWBColors(0.5, rcp, gcp, bcp);
             linalgPM1ToRWBColors(1, rp, gp, bp);
         }
-        sprintf(buf, "<table cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><tr><td><table cellpadding=\"3\" cellspacing=\"0\" border=\"0\"><tr>"
+        sprintf(buf, "<table %s cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><tr><td><table width=\"100%%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\"><tr>"
                      "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;%9.3lg&nbsp;</nobr></td>"
                      "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;&nbsp;&mdash;&nbsp;&nbsp;&nbsp;</nobr></td>"
                      "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;%9.3lg&nbsp;</nobr></td>"
                      "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;&nbsp;&mdash;&nbsp;&nbsp;&nbsp;</nobr></td>"
                      "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;%9.3lg&nbsp;</nobr></td>"
-                     "</tr></table></td></tr></table>", int(rm), int(gm), int(bm), vm, int(rmc), int(gmc), int(bmc), int(rc), int(gc), int(bc), vc, int(rcp), int(gcp), int(bcp), int(rp), int(gp), int(bp), vp);
+                     "</tr></table></td></tr></table>", colortableformat.c_str(), int(rm), int(gm), int(bm), vm, int(rmc), int(gmc), int(bmc), int(rc), int(gc), int(bc), vc, int(rcp), int(gcp), int(bcp), int(rp), int(gp), int(bp), vp);
         (*colorlabel)=std::string(buf);
     }
     return ost.str();
