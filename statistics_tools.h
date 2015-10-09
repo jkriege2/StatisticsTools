@@ -4331,11 +4331,11 @@ inline std::string linalgMatrixToHTMLString(T* matrix, long L, long C, int width
             linalgPM1ToRWBColors(1, rp, gp, bp);
         }
         sprintf(buf, "<table cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><tr><td><table cellpadding=\"3\" cellspacing=\"0\" border=\"0\"><tr>"
-                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;%9.3lg&nbsp;&nbsp;</nobr></td>"
+                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;%9.3lg&nbsp;</nobr></td>"
                      "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;&nbsp;&mdash;&nbsp;&nbsp;&nbsp;</nobr></td>"
-                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;%9.3lg&nbsp;&nbsp;</nobr></td>"
+                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;%9.3lg&nbsp;</nobr></td>"
                      "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;&nbsp;&mdash;&nbsp;&nbsp;&nbsp;</nobr></td>"
-                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;%9.3lg&nbsp;&nbsp;</nobr></td>"
+                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;%9.3lg&nbsp;</nobr></td>"
                      "</tr></table></td></tr></table>", int(rm), int(gm), int(bm), vm, int(rmc), int(gmc), int(bmc), int(rc), int(gc), int(bc), vc, int(rcp), int(gcp), int(bcp), int(rp), int(gp), int(bp), vp);
         (*colorlabel)=std::string(buf);
     }
