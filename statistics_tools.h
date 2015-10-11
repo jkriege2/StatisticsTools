@@ -4130,12 +4130,12 @@ class StatisticsScopedPointer {
         }
 
 
-        inline  T& operator=(T* p) {
+        inline  StatisticsScopedPointer<T>& operator=(T* p) {
              pntr=p;
              return *this;
          }
 
-        inline  T& operator=(const StatisticsScopedPointer<T>& p) {
+        inline  StatisticsScopedPointer<T>& operator=(const StatisticsScopedPointer<T>& p) {
              pntr=p.pntr;
              return *this;
          }
