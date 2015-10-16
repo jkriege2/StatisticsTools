@@ -3966,9 +3966,10 @@ inline bool statistics2PeakFindSorted(T& peakPos, T& peakWidth, T& peakPos2, T& 
     T* dY=statisticsDuplicateArray(dataY, N);
 
     T pH=0;
+    T pB=peakInitBaseLine;
     //printArray(dX, N, "    in x = ");
     //printArray(dY, N, "    in y = ");
-    peakPos=statisticsPeakFindSorted(peakWidth, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, &pH);
+    peakPos=statisticsPeakFindSorted(peakWidth, dX, dY, N, peakInitialWidth, pB, &pB, &pH);
     if (peakHeightOut) *peakHeightOut=pH;
     if (statisticsFloatIsOK(peakPos)) {
         T sigma=peakWidth/2.3548;
@@ -3979,11 +3980,12 @@ inline bool statistics2PeakFindSorted(T& peakPos, T& peakWidth, T& peakPos2, T& 
 
         //printf("found single-peak @ %lf,   width=%lf,   height=%lf\n", peakPos, peakWidth, pH);
 
-        peakPos2=statisticsPeakFindSorted(peakWidth2, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, peakHeightOut2);
+        peakPos2=statisticsPeakFindSorted(peakWidth2, dX, dY, N, peakInitialWidth, pB, NULL, peakHeightOut2);
     }
 
     if (dX) statisticsFree(dX);
     if (dY) statisticsFree(dY);
+    if (peakBaseLineOut) *peakBaseLineOut=pB;
 
     return statisticsFloatIsOK(peakPos);
 }
@@ -4003,9 +4005,10 @@ inline bool statistics3PeakFindSorted(T& peakPos, T& peakWidth, T& peakPos2, T& 
 
     T pH=0;
     T pH2=0;
+    T pB=peakInitBaseLine;
     //printArray(dX, N, "    in x = ");
     //printArray(dY, N, "    in y = ");
-    peakPos=statisticsPeakFindSorted(peakWidth, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, &pH);
+    peakPos=statisticsPeakFindSorted(peakWidth, dX, dY, N, peakInitialWidth, NAN, &pB, &pH);
     if (peakHeightOut) *peakHeightOut=pH;
     if (statisticsFloatIsOK(peakPos)) {
         T sigma=peakWidth/2.3548;
@@ -4016,17 +4019,18 @@ inline bool statistics3PeakFindSorted(T& peakPos, T& peakWidth, T& peakPos2, T& 
 
         //printf("found single-peak @ %lf,   width=%lf,   height=%lf\n", peakPos, peakWidth, pH);
 
-        peakPos2=statisticsPeakFindSorted(peakWidth2, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, &pH);
+        peakPos2=statisticsPeakFindSorted(peakWidth2, dX, dY, N, peakInitialWidth, pB, NULL, &pH);
         if (peakHeightOut2) *peakHeightOut2=pH2;
         sigma=peakWidth2/2.3548;
         for (long long i=0; i<N; i++) {
             dY[i]=dY[i]-pH2*exp(-0.5*(dX[i]-peakPos2)*(dX[i]-peakPos2)/sigma/sigma);
         }
-        peakPos3=statisticsPeakFindSorted(peakWidth3, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, peakHeightOut3);
+        peakPos3=statisticsPeakFindSorted(peakWidth3, dX, dY, N, peakInitialWidth, pB, NULL, peakHeightOut3);
     }
 
     if (dX) statisticsFree(dX);
     if (dY) statisticsFree(dY);
+    if (peakBaseLineOut) *peakBaseLineOut=pB;
 
     return statisticsFloatIsOK(peakPos);
 }
