@@ -1,5 +1,6 @@
 /*
-    Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+    Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), 
+                            German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
     
 
@@ -818,7 +819,10 @@ inline void statisticsMaskedMinMax(const T* data, const bool* mask, long long N,
     }
 }
 
-/** \brief calculate min/max of a given array, only taking into account the pixels for which \c mask[i]==maskUseValue */
+/** \brief calculate min/max of a given array, only taking into account the pixels for which \c mask[i]==maskUseValue: In this function, the index into the mask is given by \c maskIdx=idx%Nmask, i.e. the mask may be smaller than the data and is repeated, if it is smaller.
+ *
+ * This can be used for masks in an image stack, where the mask is per frame (size w*h), but the stack consists of several frames (each frame is w*h and then N=Nframes*w*h).
+*/
 template <class T>
 inline void statisticsModMaskedMinMax(const T* data, const bool* mask, long long N, long long Nmask, T& min, T& max, bool maskUseValue=false) {
     if (!mask) {
@@ -1258,7 +1262,9 @@ inline void statisticsCrosscorrelateMultiTauSymmetricWithBlocking(double* dataou
 
                     lastvar.push_back(var);
                     lastvarerr.push_back(varerr);
+
                     bcurveT.push_back((int)pow(2.0,(double)b));
+
 
                     //std::cout<<b<<"; "<<pow(2,b)<<"; "<<(var)<<"; "<<(varerr)<<"; "<<Nb;
                     if (b>0)  {
@@ -1727,7 +1733,11 @@ inline void statisticsCrosscorrelateMultiTauAvgSymmetricWithBlocking(double* dat
 
                         lastvar.push_back(var);
                         lastvarerr.push_back(varerr);
+<<<<<<< HEAD
                         bcurveT.push_back((int)pow(2.0,(double)b));
+=======
+                        bcurveT.push_back(pow(2.0,(double)b));
+>>>>>>> 16d2ecf816e36d8e05ca1440600a6abd5ec187d1
 
                         //std::cout<<b<<"; "<<pow(2,b)<<"; "<<(var)<<"; "<<(varerr)<<"; "<<Nb;
                         if (b>0)  {
@@ -3885,7 +3895,7 @@ inline T statisticsPeakFindSorted(T& peakWidth, const T* dataX, const T* dataY, 
     if (ddXm) statisticsFree(ddXm);
     if (ddYm) statisticsFree(ddYm);
     if (peakBaseLineOut) *peakBaseLineOut=pB;
-    if (peakBaseLineOut) *peakHeightOut=pH;
+    if (peakHeightOut) *peakHeightOut=pH;
     return pP;
 }
 
@@ -3962,9 +3972,11 @@ inline bool statistics2PeakFindSorted(T& peakPos, T& peakWidth, T& peakPos2, T& 
     T* dY=statisticsDuplicateArray(dataY, N);
 
     T pH=0;
+    T pB=peakInitBaseLine;
+    T* dummy=NULL;
     //printArray(dX, N, "    in x = ");
     //printArray(dY, N, "    in y = ");
-    peakPos=statisticsPeakFindSorted(peakWidth, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, &pH);
+    peakPos=statisticsPeakFindSorted(peakWidth, dX, dY, N, peakInitialWidth, pB, &pB, &pH);
     if (peakHeightOut) *peakHeightOut=pH;
     if (statisticsFloatIsOK(peakPos)) {
         T sigma=peakWidth/2.3548;
@@ -3975,11 +3987,12 @@ inline bool statistics2PeakFindSorted(T& peakPos, T& peakWidth, T& peakPos2, T& 
 
         //printf("found single-peak @ %lf,   width=%lf,   height=%lf\n", peakPos, peakWidth, pH);
 
-        peakPos2=statisticsPeakFindSorted(peakWidth2, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, peakHeightOut2);
+        peakPos2=statisticsPeakFindSorted(peakWidth2, dX, dY, N, peakInitialWidth, pB, dummy, peakHeightOut2);
     }
 
     if (dX) statisticsFree(dX);
     if (dY) statisticsFree(dY);
+    if (peakBaseLineOut) *peakBaseLineOut=pB;
 
     return statisticsFloatIsOK(peakPos);
 }
@@ -3999,9 +4012,11 @@ inline bool statistics3PeakFindSorted(T& peakPos, T& peakWidth, T& peakPos2, T& 
 
     T pH=0;
     T pH2=0;
+    T pB=peakInitBaseLine;
+    T* dummy=NULL;
     //printArray(dX, N, "    in x = ");
     //printArray(dY, N, "    in y = ");
-    peakPos=statisticsPeakFindSorted(peakWidth, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, &pH);
+    peakPos=statisticsPeakFindSorted(peakWidth, dX, dY, N, peakInitialWidth, pB, &pB, &pH);
     if (peakHeightOut) *peakHeightOut=pH;
     if (statisticsFloatIsOK(peakPos)) {
         T sigma=peakWidth/2.3548;
@@ -4012,17 +4027,18 @@ inline bool statistics3PeakFindSorted(T& peakPos, T& peakWidth, T& peakPos2, T& 
 
         //printf("found single-peak @ %lf,   width=%lf,   height=%lf\n", peakPos, peakWidth, pH);
 
-        peakPos2=statisticsPeakFindSorted(peakWidth2, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, &pH);
+        peakPos2=statisticsPeakFindSorted(peakWidth2, dX, dY, N, peakInitialWidth, pB, dummy, &pH);
         if (peakHeightOut2) *peakHeightOut2=pH2;
         sigma=peakWidth2/2.3548;
         for (long long i=0; i<N; i++) {
             dY[i]=dY[i]-pH2*exp(-0.5*(dX[i]-peakPos2)*(dX[i]-peakPos2)/sigma/sigma);
         }
-        peakPos3=statisticsPeakFindSorted(peakWidth3, dX, dY, N, peakInitialWidth, peakInitBaseLine, peakBaseLineOut, peakHeightOut3);
+        peakPos3=statisticsPeakFindSorted(peakWidth3, dX, dY, N, peakInitialWidth, pB, dummy, peakHeightOut3);
     }
 
     if (dX) statisticsFree(dX);
     if (dY) statisticsFree(dY);
+    if (peakBaseLineOut) *peakBaseLineOut=pB;
 
     return statisticsFloatIsOK(peakPos);
 }
@@ -4126,12 +4142,12 @@ class StatisticsScopedPointer {
         }
 
 
-        inline  T& operator=(T* p) {
+        inline  StatisticsScopedPointer<T>& operator=(T* p) {
              pntr=p;
              return *this;
          }
 
-        inline  T& operator=(const StatisticsScopedPointer<T>& p) {
+        inline  StatisticsScopedPointer<T>& operator=(const StatisticsScopedPointer<T>& p) {
              pntr=p.pntr;
              return *this;
          }
@@ -4241,12 +4257,23 @@ inline void linalgPM1ToRWBColors(double val, uint8_t& r, uint8_t& g, uint8_t& b)
     }
 }
 
+/*! \brief maps the number range -1 ... +1 to a non-linear color-scale lightblue - white - lightred (used for coloring matrices!)
+    \ingroup tools_math_linalg
+
+*/
+inline void linalgPM1ToNonlinRWBColors(double val, uint8_t& r, uint8_t& g, uint8_t& b, double gamma=0.5){
+    if (val<0) {
+        linalgPM1ToRWBColors(-1.0*pow(-val,gamma),r,g,b);
+    } else {
+        linalgPM1ToRWBColors(pow(val,gamma),r,g,b);
+    }
+}
 /*! \brief convert the given LxC matrix to std::string, encoded as HTML table
     \ingroup tools_math_linalg
 
 */
 template <class T>
-inline std::string linalgMatrixToHTMLString(T* matrix, long L, long C, int width=9, int precision=3, const std::string& mode=std::string("g"), const std::string& tableformat=std::string(), const std::string& prenumber=std::string(), const std::string& postnumber=std::string(), bool colorcoding=false, bool zeroIsWhite=true, std::string* colorlabel=NULL) {
+inline std::string linalgMatrixToHTMLString(T* matrix, long L, long C, int width=9, int precision=3, const std::string& mode=std::string("g"), const std::string& tableformat=std::string(), const std::string& prenumber=std::string(), const std::string& postnumber=std::string(), bool colorcoding=false, bool zeroIsWhite=true, std::string* colorlabel=NULL, bool nonlinColors=false, double nonlinColorsGamma=0.25, const std::string& colortableformat=std::string()) {
     std::ostringstream ost;
     ost<<"<table "<<tableformat<<">\n";
     std::string format="%"+linalgIntToStr(width)+std::string(".")+linalgIntToStr(precision)+std::string("l")+mode;
@@ -4268,7 +4295,11 @@ inline std::string linalgMatrixToHTMLString(T* matrix, long L, long C, int width
                 } else {
                     valrel=((val-minv)/(maxv-minv)-0.5)*2.0;
                 }
-                linalgPM1ToRWBColors(valrel, r,g,b);
+                if (nonlinColors) {
+                    linalgPM1ToNonlinRWBColors(valrel, r,g,b, nonlinColorsGamma);
+                } else {
+                    linalgPM1ToRWBColors(valrel, r,g,b);
+                }
                 char buf[500];
                 sprintf(buf, " bgcolor=\"#%02X%02X%02X\"", int(r), int(g), int(b));
                 cols=buf;
@@ -4298,18 +4329,26 @@ inline std::string linalgMatrixToHTMLString(T* matrix, long L, long C, int width
         if (!zeroIsWhite) {
             vc=(maxv+minv)/2.0;
         }
-        linalgPM1ToRWBColors(-1, rm, gm, bm);
-        linalgPM1ToRWBColors(-0.5, rmc, gmc, bmc);
-        linalgPM1ToRWBColors(0, rc, gc, bc);
-        linalgPM1ToRWBColors(0.5, rcp, gcp, bcp);
-        linalgPM1ToRWBColors(1, rp, gp, bp);
-        sprintf(buf, "<table cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><tr><td><table cellpadding=\"3\" cellspacing=\"0\" border=\"0\"><tr>"
-                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>%9.3lg</nobr></td>"
-                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;&nbsp;</nobr></td>"
-                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>%9.3lg</nobr></td>"
-                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;&nbsp;</nobr></td>"
-                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>%9.3lg</nobr></td>"
-                     "</tr></table></td></tr></table>", int(rm), int(gm), int(bm), vm, int(rmc), int(gmc), int(bmc), int(rc), int(gc), int(bc), vc, int(rcp), int(gcp), int(bcp), int(rp), int(gp), int(bp), vp);
+        if (nonlinColors) {
+            linalgPM1ToNonlinRWBColors(-1, rm, gm, bm, nonlinColorsGamma);
+            linalgPM1ToNonlinRWBColors(-0.5, rmc, gmc, bmc, nonlinColorsGamma);
+            linalgPM1ToNonlinRWBColors(0, rc, gc, bc, nonlinColorsGamma);
+            linalgPM1ToNonlinRWBColors(0.5, rcp, gcp, bcp, nonlinColorsGamma);
+            linalgPM1ToNonlinRWBColors(1, rp, gp, bp, nonlinColorsGamma);
+        } else {
+            linalgPM1ToRWBColors(-1, rm, gm, bm);
+            linalgPM1ToRWBColors(-0.5, rmc, gmc, bmc);
+            linalgPM1ToRWBColors(0, rc, gc, bc);
+            linalgPM1ToRWBColors(0.5, rcp, gcp, bcp);
+            linalgPM1ToRWBColors(1, rp, gp, bp);
+        }
+        sprintf(buf, "<table %s cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><tr><td><table width=\"100%%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\"><tr>"
+                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;%9.3lg&nbsp;</nobr></td>"
+                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;&nbsp;&mdash;&nbsp;&nbsp;&nbsp;</nobr></td>"
+                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;%9.3lg&nbsp;</nobr></td>"
+                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;&nbsp;&nbsp;&mdash;&nbsp;&nbsp;&nbsp;</nobr></td>"
+                     "<td bgcolor=\"#%02X%02X%02X\" width=\"20%%\"><nobr>&nbsp;%9.3lg&nbsp;</nobr></td>"
+                     "</tr></table></td></tr></table>", colortableformat.c_str(), int(rm), int(gm), int(bm), vm, int(rmc), int(gmc), int(bmc), int(rc), int(gc), int(bc), vc, int(rcp), int(gcp), int(bcp), int(rp), int(gp), int(bp), vp);
         (*colorlabel)=std::string(buf);
     }
     return ost.str();
