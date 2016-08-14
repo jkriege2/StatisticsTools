@@ -361,6 +361,205 @@ inline double statisticsAverage(const T* data, long long N) {
 }
 
 
+/*! \brief calculate the number of elements in \a value that contain a valid float
+    \ingroup tools_math_stat
+*/
+template <class T>
+inline long long statisticsCount(const T& value) {
+    long long N=value.size();
+    if (N<=0) return 0;
+    register long long NN=0;
+    for (register long long i=0; i<N; i++) {
+        if (statisticsFloatIsOK(value[i])) {
+            NN++;
+        }
+    }
+    return NN;
+}
+
+/*! \brief filter the vecor for NAN ....
+    \ingroup tools_math_stat
+
+*/
+template <class T>
+inline T statisticsFilter(const T& value) {
+    long long N=value.size();
+    if (N<1) return T();
+    T res;
+    for (register long long i=0; i<N; i++) {
+        if (statisticsFloatIsOK(value[i])) {
+            res<<(double)(value[i]);
+        }
+    }
+    return res;
+}
+
+/*! \brief calculate the trapezoidal numerical integration
+    \ingroup tools_math_stat
+
+    \f[ \int f(x)\mathrm{d}x=\frac{1}{2}\cdot\sum\limits_{n=1}^{N-1}\left(f(x_n)+f(x_n+1)\right) \f]
+
+*/
+template <class T>
+inline double statisticsTrapz(const T& value_in) {
+    T value=statisticsFilter(value_in);
+    long long N=value.size();
+    if (N<=1) return 0;
+    double res=0;
+    if (N>1) {
+        for (register long long i=0; i<N-1; i++) {
+            res=res+(value[i]+value[i+1]);
+        }
+    }
+    return res/2.0;
+}
+
+
+/*! \brief calculate the trapezoidal numerical integration
+    \ingroup tools_math_stat
+
+    \f[ \int f(x)\mathrm{d}x=\frac{1}{2}\cdot\sum\limits_{n=1}^{N-1}(x_{n+1}-x_n)\cdot\left[f(x_n)+f(x_n+1)\right] \f]
+
+*/
+template <class T>
+inline double statisticsTrapzXY(const T& valueX, const T& valueY) {
+    T X,Y;
+
+    long long N=std::min(valueX.size(), valueY.size());
+    if (N<=1) return 0;
+    for (register long long i=0; i<N; i++) {
+        if (statisticsFloatIsOK(valueX[i]) && statisticsFloatIsOK(valueY[i])) {
+            X<<(double)(valueX[i]);
+            Y<<(double)(valueY[i]);
+        }
+    }
+
+    N=std::min(X.size(), Y.size());
+    if (N<=1) return 0;
+    double res=0;
+    if (N>1) {
+        for (register long long i=0; i<N-1; i++) {
+            res=res+(Y[i]+Y[i+1])*(X[i+1]-X[i]);
+        }
+    }
+    return res/2.0;
+}
+
+/*! \brief calculates the product of all elements of a given timeseries \a data
+    \ingroup tools_math_stat
+
+    \param[in] data input timeseries \f$ X_i \f$ of length \a N
+    \param[in] N size of input data \a data
+    \return average of \a data
+
+    This function implements:
+      \f[ \overline{X}=\prod\limits_{i=0}^{N-1}X_i \f]
+*/
+template <class T>
+inline double statisticsProd(const T* data, long long N) {
+    if (!data) return 0;
+    if (N<=0) return 0;
+    register double sum=1;
+    long long NN=0;
+    register long long i;
+    //#pragma omp simd reduction(+:sum)
+    for (i=0; i<N; i++) {
+        register const double v=data[i];
+        if (statisticsFloatIsOK(v)) {
+            sum=sum*v;
+        }
+    }
+    return sum;
+}
+
+
+/*! \brief calculates the product of all elements of a given timeseries \a data
+    \ingroup tools_math_stat
+
+    \param[in] data input timeseries \f$ X_i \f$ of length \a N
+    \param[in] N size of input data \a data
+    \return average of \a data
+
+    This function implements:
+      \f[ \overline{X}=\prod\limits_{i=0}^{N-1}X_i \f]
+*/
+template <class T>
+inline double statisticsProdV(const T& data) {
+    return statisticsProd(data.data(), data.size());
+}
+
+
+
+/*! \brief calculate the differences o the vector of numbers
+    \ingroup tools_math_stat
+
+    \f[ X_n=v_n-v_{n-1} \f]
+    The returned vector has one item less than the input vector
+*/
+template <class T>
+inline T statisticsDiff(const T& value) {
+    long long N=value.size();
+    if (N<=1) return T();
+    T res;
+    if (N>1) {
+        for (register long long i=1; i<N; i++) {
+            if (statisticsFloatIsOK(value[i]) && statisticsFloatIsOK(value[i-1])) {
+                res.push_back(value[i]-value[i-1]);
+
+            } else {
+                res.push_back(NAN);
+            }
+
+        }
+    }
+    return res;
+}
+
+
+/*! \brief calculate the cumulative sum of data
+    \ingroup tools_math_stat
+
+    \f[ X_n=\sum\limits_{i=0}^{n-1} v_i \f]
+*/
+template <class T>
+inline T statisticsCumSum(const T& value) {
+    long long N=value.size();
+    if (N<1) return T();
+    double sum=0;
+    T res;
+    for (register long long i=0; i<N; i++) {
+        if (statisticsFloatIsOK(value[i])) {
+            sum=sum+(double)(value[i]);
+
+        }
+        res.push_back(sum);
+    }
+    return res;
+}
+
+
+/*! \brief calculate the cumulative sum of data
+    \ingroup tools_math_stat
+
+    \f[ X_n=\prod\limits_{i=0}^{n-1} v_i \f]
+*/
+template <class T>
+inline T statisticsCumProd(const T& value) {
+    long long N=value.size();
+    if (N<1) return T();
+    double prod=1;
+    T res;
+    for (register long long i=0; i<N; i++) {
+        if (statisticsFloatIsOK(value[i])) {
+            prod=prod*(double)(value[i]);
+
+        }
+        res.push_back(prod);
+    }
+    return res;
+}
+
+
 /*! \brief calculates the sum of a given timeseries \a data
     \ingroup tools_math_stat
 
@@ -387,6 +586,66 @@ inline double statisticsSum(const T* data, long long N) {
     }
     return sum;
 }
+
+
+/*! \brief calculates the sum of a given timeseries \a data
+    \ingroup tools_math_stat
+
+    \param[in] data input timeseries \f$ X_i \f$ of length \a N
+    \param[in] N size of input data \a data
+    \return average of \a data
+
+    This function implements:
+      \f[ \overline{X}=\sum\limits_{i=0}^{N-1}X_i \f]
+*/
+template <class T>
+inline double statisticsSumV(const T& data) {
+    return statisticsSum<typename T::value_type>(data.data(), data.size());
+}
+
+/*! \brief calculates the sum of squares of a given timeseries \a data
+    \ingroup tools_math_stat
+
+    \param[in] data input timeseries \f$ X_i \f$ of length \a N
+    \param[in] N size of input data \a data
+    \return average of \a data
+
+    This function implements:
+      \f[ \overline{X}=\sum\limits_{i=0}^{N-1}X_i^2 \f]
+*/
+template <class T>
+inline double statisticsSum2(const T* data, long long N) {
+    if (!data) return 0;
+    if (N<=0) return 0;
+    register double sum=0;
+    long long NN=0;
+    register long long i;
+    //#pragma omp simd reduction(+:sum)
+    for (i=0; i<N; i++) {
+        register const double v=data[i];
+        if (statisticsFloatIsOK(v)) {
+            sum=sum+v*v;
+        }
+    }
+    return sum;
+}
+
+/*! \brief calculates the sum of squares of a given timeseries \a data
+    \ingroup tools_math_stat
+
+    \param[in] data input timeseries \f$ X_i \f$ of length \a N
+    \param[in] N size of input data \a data
+    \return average of \a data
+
+    This function implements:
+      \f[ \overline{X}=\sum\limits_{i=0}^{N-1}X_i^2 \f]
+*/
+template <class T>
+inline double statisticsSum2V(const T& data) {
+    return statisticsSum2(data.data(), data.size());
+}
+
+
 /*! \brief calculate the weighted average of a given array
 
     \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
@@ -407,6 +666,15 @@ inline double statisticsAverage(const T* weights, const T* value, long long N) {
         }
     }
     return sum2/sum;
+}
+
+/*! \brief calculate the weighted average of a given array
+
+    \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
+*/
+template <class T>
+inline double statisticsAverageV(const T& vec) {
+    return statisticsAverage(vec.data(), vec.size());
 }
 
 /*! \brief calculate the weighted average of a given array
@@ -499,6 +767,15 @@ inline double statisticsVariance(const T* value, long long N) {
     }
 }
 
+/*! \brief calculate  variance of a given array
+
+    \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}(v_i-\overline{v})^2}{N-1} \f]
+*/
+template <class T>
+inline double statisticsVarianceV(const T& v) {
+    return statisticsVariance(v.data(), v.size());
+}
+
 
 template <class T>
 inline double statisticsVarianceMasked(const bool* mask, const T* value, long long N, bool maskUseValue=true) {
@@ -533,6 +810,16 @@ inline double statisticsVarianceMasked(const bool* mask, const T* value, long lo
 template <class T>
 inline double statisticsStdDev(const T* value, long long N) {
     return sqrt(statisticsVariance(value, N));
+}
+
+
+/*! \brief calculate weighted standard deviation of a given array
+
+    \f[ \sigma(v)=\sqrt{\frac{\sum\limits_{i=0}^{N-1}(v_i-\overline{v})^2}{N-1}} \f]
+*/
+template <class T>
+inline double statisticsStdDevV(const T& value) {
+    return sqrt(statisticsVariance(value.data(), value.size()));
 }
 
 
@@ -653,6 +940,17 @@ inline double statisticsSkewness(const T* value, long long N, double* average=NU
     return sum3/double(NN)/sqrt(down);
 }
 
+/*! \brief calculate the skewness of a dataset
+
+    \f[ \gamma_1=\mathbb{E}\left[\left(\frac{X-\mu}{\sigma}\right)^3\right]= \frac{m_3}{m_2^{3/2}}  = \frac{\frac{1}{n} \sum_{i=1}^n (x_i-\overline{x})^3}{\left(\frac{1}{n} \sum_{i=1}^n (x_i-\overline{x})^2\right)^{3/2}} \f]
+    where \f$\mu\f$ is the mean and \f$\sigma\f$ the standard deviation of a random variable \f$X\f$ and \f$\overline{x}\f$ is the average (calculated using statisticsAverage() ) of
+    the input dataset \f$ x_i\f$.
+*/
+template <class T>
+inline double statisticsSkewnessV(const T& value) {
+    return statisticsSkewness(value.data(), value.size());
+}
+
 /*! \brief calculate the given central  moment
 
     \f[ \langle X^n\rangle= \mathbb{E}\left[\left(X-\mu\right)^n\right] \f]
@@ -678,6 +976,16 @@ inline double statisticsCentralMoment(const T* value, long long N, int order) {
     return sum/double(NN);
 }
 
+/*! \brief calculate the given central  moment
+
+    \f[ \langle X^n\rangle= \mathbb{E}\left[\left(X-\mu\right)^n\right] \f]
+    where \f$\mu\f$ is the mean of a random variable \f$X\f$ and \f$\overline{x}\f$ is the average (calculated using statisticsAverage() ) of
+    the input dataset \f$ x_i\f$.
+*/
+template <class T>
+inline double statisticsCentralMomentV(const T& value, int order) {
+    return statisticsCentralMoment(value.data(), value.size(), order);
+}
 
 /*! \brief calculate the given non-central  moment
 
@@ -703,6 +1011,16 @@ inline double statisticsMoment(const T* value, long long N, int order) {
     return sum/double(NN);
 }
 
+/*! \brief calculate the given non-central  moment
+
+    \f[ \langle X^n\rangle= \mathbb{E}\left[X^n\right] \f]
+    where \f$\mu\f$ is the mean of a random variable \f$X\f$ and \f$\overline{x}\f$ is the average (calculated using statisticsAverage() ) of
+    the input dataset \f$ x_i\f$.
+*/
+template <class T>
+inline double statisticsMomentV(const T& value, int order) {
+    return statisticsMoment(value.data(), value.size(), order);
+}
 
 /*! \brief calculate empirical (Pearson's) correlation coefficient
 
@@ -741,6 +1059,15 @@ inline double statisticsCorrelationCoefficient(const T* dataX, const T* dataY, l
     return sumxy/sqrt(sumx*sumy);
 }
 
+
+/*! \brief calculate empirical (Pearson's) correlation coefficient
+
+    \f[ \text{Kor}(x,y)=\frac{\sum\limits_{i=0}^{N-1}(x_i-\overline{x})(y_i-\overline{y})}{\sqrt{\sum\limits_{i=0}^{N-1}(x_i-\overline{x})^2\cdot\sum\limits_{i=0}^{N-1}(y_i-\overline{y})^2}} \f]
+*/
+template <class T>
+inline double statisticsCorrelationCoefficientV(const T& dataX, const T& dataY) {
+    return statisticsCorrelationCoefficient(dataX.data(), dataY.data(), dataX.size());
+}
 
 
 /*! \brief calculate empirical Manders overlap coefficient
@@ -850,6 +1177,7 @@ inline void statisticsModMaskedMinMax(const T* data, const bool* mask, long long
         }
     }
 }
+
 /** \brief calculate min of a given array */
 template <class T>
 inline T statisticsMin(const T* data, long long N, long long* minpos=NULL) {
@@ -884,6 +1212,17 @@ inline T statisticsMax(const T* data, long long N, long long* maxpos=NULL) {
     return max;
 }
 
+/** \brief calculate min of a given array */
+template <class T>
+inline typename T::value_type statisticsMinV(const T& data) {
+    return statisticsMin(data.data(), data.size());
+}
+
+/** \brief calculate max of a given array */
+template <class T>
+inline typename T::value_type statisticsMaxV(const T& data) {
+    return statisticsMax(data.data(), data.size());
+}
 
 /*! \brief calculates the autocorrelation function of a given timeseries \a data
     \ingroup tools_math_stat
@@ -2152,6 +2491,15 @@ inline T statisticsMedian(const T* input, long long N) {
     return res;
 }
 
+/*! \brief return the median from an array
+    \ingroup tools_math_stat
+
+    if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
+*/
+template <class T>
+inline typename T::value_type statisticsMedianV(const T& input) {
+    return statisticsMedian(input.data(), input.size());
+}
 
 /*! \brief return the median from an array
     \ingroup tools_math_stat
@@ -2241,6 +2589,20 @@ inline T statisticsMAD(const T* value, long long N, T* median=NULL) {
     return res;
 }
 
+/*! \brief calculates the median absolute deviation about the median (MAD), a robust measure of sample deviation, the data has to be a sorted array!
+
+    \f[ \mbox{MAD}(\vec{x})=\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\} \f]
+
+    If \a median is \c !=NULL, the median is returned in this parameter
+
+    \see Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1
+*/
+template <class T>
+inline typename T::value_type statisticsMADV(const T& value) {
+    return statisticsMAD<typename T::value_type>(value.data(), value.size(), NULL);
+
+}
+
 /*! \brief calculates the normalized median absolute deviation about the median (NMAD), a robust measure of sample deviation, the data has to be a sorted array!
 
     \f[ \mbox{NMAD}(\vec{x})=\frac{\mbox{MAD}(\vec{x})}{0.6745}=\frac{\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}}{0.6745} \f]
@@ -2255,6 +2617,18 @@ inline double statisticsNMAD(const T* value, long long N, T* median=NULL) {
 }
 
 
+/*! \brief calculates the normalized median absolute deviation about the median (NMAD), a robust measure of sample deviation, the data has to be a sorted array!
+
+    \f[ \mbox{NMAD}(\vec{x})=\frac{\mbox{MAD}(\vec{x})}{0.6745}=\frac{\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}}{0.6745} \f]
+
+    If \a median is \c !=NULL, the median is returned in this parameter
+
+    \see Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1
+*/
+template <class T>
+inline double statisticsNMADV(const T& value) {
+    return statisticsMADV(value)/0.6745;
+}
 /*! \brief return the given quantile from a sorted array
     \ingroup tools_math_stat
 
@@ -2276,10 +2650,9 @@ inline T statisticsSortedQuantile(T* input, long long N, double quantile) {
 
 
 
-/*! \brief return the median from an array
+/*! \brief return the given quantile from an array
     \ingroup tools_math_stat
 
-    if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
 */
 template <class T>
 inline T statisticsQuantile(const T* input, long long N, double quantile) {
@@ -2297,6 +2670,59 @@ inline T statisticsQuantile(const T* input, long long N, double quantile) {
     if (sorted) statisticsFree(sorted);
     return res;
 }
+
+
+
+
+/*! \brief return the given quantile from an array
+    \ingroup tools_math_stat
+
+*/
+template <class T>
+inline typename T::value_type statisticsQuantileV(const T& input, double quantile) {
+    return statisticsQuantile(input.data(), input.size(), quantile);
+}
+
+
+/*! \brief return the 25% quantile from an array
+    \ingroup tools_math_stat
+
+*/
+template <class T>
+inline T statisticsQuantile25(const T* input, long long N) {
+    return statisticsQuantile(input, N, 0.25);
+}
+
+
+/*! \brief return the 25% quantile from an array
+    \ingroup tools_math_stat
+
+*/
+template <class T>
+inline T statisticsQuantile25V(const T& input) {
+    return statisticsQuantile(input.data(), input.size(), 0.25);
+}
+
+
+/*! \brief return the 75% quantile from an array
+    \ingroup tools_math_stat
+
+*/
+template <class T>
+inline T statisticsQuantile75(const T* input, long long N) {
+    return statisticsQuantile(input, N, 0.75);
+}
+
+
+/*! \brief return the 75% quantile from an array
+    \ingroup tools_math_stat
+
+*/
+template <class T>
+inline T statisticsQuantile75V(const T& input) {
+    return statisticsQuantile(input.data(), input.size(), 0.75);
+}
+
 
 
 /*! \brief return the median from an array
