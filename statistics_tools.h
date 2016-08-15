@@ -460,7 +460,6 @@ inline double statisticsProd(const T* data, long long N) {
     if (!data) return 0;
     if (N<=0) return 0;
     register double sum=1;
-    long long NN=0;
     register long long i;
     //#pragma omp simd reduction(+:sum)
     for (i=0; i<N; i++) {
@@ -575,7 +574,6 @@ inline double statisticsSum(const T* data, long long N) {
     if (!data) return 0;
     if (N<=0) return 0;
     register double sum=0;
-    long long NN=0;
     register long long i;
     //#pragma omp simd reduction(+:sum)
     for (i=0; i<N; i++) {
@@ -618,7 +616,6 @@ inline double statisticsSum2(const T* data, long long N) {
     if (!data) return 0;
     if (N<=0) return 0;
     register double sum=0;
-    long long NN=0;
     register long long i;
     //#pragma omp simd reduction(+:sum)
     for (i=0; i<N; i++) {
